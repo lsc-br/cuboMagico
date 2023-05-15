@@ -1,0 +1,118 @@
+
+<!-- saved from url=(0039)http://kociemba.org/computervision.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title _msttexthash="397358" _msthash="0">Visão Computacional</title>
+
+<link rel="stylesheet" href="./Visão Computacional_files/style.css" type="text/css">
+<link rel="SHORTCUT ICON" href="http://kociemba.org/rubik1.ico">
+<style type="text/css">
+<!--
+.style3 {color: #0000FF}
+-->
+</style>
+</head>
+
+
+
+
+<body>
+<table width="789" border="0" cellpadding="20" cellspacing="30">
+  <tbody><tr> 
+    <td width="689" valign="top" bgcolor="#E7E9FA" height="79"><h1 align="center" _msttexthash="874276" _msthash="1">Visão Computacional e Cubo Mágico</h1></td>
+  </tr>
+  <tr> 
+    <td valign="top" bgcolor="#E7E9FA" height="90">
+      <p _msttexthash="42318341" _msthash="2">A ideia é segurar um rosto de um cubo mágico na frente de uma webcam e o algoritmo de visão computacional detecta a posição do rosto dentro da imagem da webcam e identifica os adesivos de facelets junto com suas cores. 
+ Subsequentemente
+ O programa resolve o cubo com o algoritmo de duas fases. </p><p _msttexthash="90768236" _msthash="3">Esta tarefa de reconhecimento é tão simples para o olho humano que você geralmente não vai desperdiçar um único pensamento sobre isso - mas se você tentar implementar isso como um algoritmo de computador, é preciso algum esforço para obter um resultado razoável. Eu uso o framework <a href="https://opencv.org/" _istranslated="1">opencv</a> e Python no meu projeto e obtive bons resultados em um PC com uma webcam USB e também com o Raspberry Pi e seu módulo de câmera não-USB. </p><p _msttexthash="751270" _msthash="4">Você pode baixar o projeto aqui: </p><p><a href="https://github.com/hkociemba/RubiksCube-TwophaseSolver" target="_blank" _msttexthash="2331563" _msthash="5">https://github.com/hkociemba/RubiksCube-TwophaseSolver</a>    
+    </p><p _msttexthash="2294539" _msthash="6">E aqui está um <a href="http://kociemba.org/themen/computervision/pics/visionexample.avi" _istranslated="1">exemplo do solucionador em ação</a>, e <a href="http://kociemba.org/themen/computervision/pics/visionexample2.avi" _istranslated="1">aqui outro</a>.</p></td>
+  </tr>
+  
+  <tr> 
+    <td valign="top" bgcolor="#E7E9FA" height="57"><p><font _mstmutation="1" _msttexthash="36254218" _msthash="7">Para detectar as facetas de um rosto de cubo, experimentei a <a href="https://en.wikipedia.org/wiki/Canny_edge_detector" _mstmutation="1" _istranslated="1">detecção de borda Canny</a>. Mas os resultados não foram satisfatórios. Então tentei outra abordagem. A característica de uma faceta de cubo é que ela é um quadrilátero com uma cor mais ou menos constante. </font><table width="614" border="0">
+        <tbody><tr>
+          <th width="302" scope="row"><img src="./Visão Computacional_files/cubepic.jpg" width="320" height="240"></th>
+          <td width="640"><img src="./Visão Computacional_files/cubepicgrid.jpg" width="320" height="240"></td>
+        </tr>
+      </tbody></table>
+      </p><p _msttexthash="78767195" _msthash="8">Para detectar tais regiões, sobrepomos uma grade na imagem e calculamos para cada quadrado de grade o desvio padrão dos valores de matiz de seus pixels. Regiões de interesse são aqueles quadrados de grade onde o desvio padrão dos valores h no espaço de cores hsv é suficientemente pequeno (isso indica facetas coloridas) - ou onde o valor s é baixo e o valor v é alto (isso indica facetas brancas).</p>
+      <p _msttexthash="55089619" _msthash="9">Cada um dos quadrados de grade "interessantes" (fazemos isso separadamente para branco e cor) é então estendido para um quadrado 3x3 com o quadrado "interessante" no centro. Para o quadrado 3x3 criamos então uma máscara binária onde selecionamos (filtramos) todos os pixels com propriedades semelhantes ao quadrado central.</p>
+      <p _msttexthash="109295758" _msthash="10">Todas essas máscaras 3x3 são colocadas juntas e, dessa forma, temos uma máscara white_filter e uma máscara color_filter para a grade completa. Essencialmente, procuramos objetos em forma de quadrado nessas duas máscaras. <br _istranslated="1"> É possível obter melhores resultados se nós E cada uma dessas máscaras com a "máscara black_filter" para mascarar todos os pixels escuros, porque eles nunca fazem parte de um facelet de cubo (então adesivos pretos não são suportados).</p></td>
+</tr>
+  
+  
+  <tr> 
+   <td valign="top" bgcolor="#E7E9FA" height="205"><p _msttexthash="36049455" _msthash="11">Embora seja desejável detectar as facetas "fora da caixa", vistas realisticamente, existem alguns requisitos para alcançar um reconhecimento de facetas confiável com este método devido às diferentes condições de iluminação, webcams, cores de cubo etc. </p><ul>
+       <li _msttexthash="6770400" _msthash="12">Use um cubo onde as facetas estejam bem separadas e os espaços entre os adesivos sejam maiores do que pequenos.</li>
+       <li _msttexthash="2357368" _msthash="13">Calibrar os parâmetros dos filtros no início de uma sessão.</li>
+       <li _msttexthash="18254249" _msthash="14">Às vezes, desativar o balanço de branco automático e o brilho automático no software de configuração da sua webcam e ajustar as configurações manualmente dá melhores resultados.</li>
+     </ul>
+    </td>
+  </tr>
+ <tr> 
+   <td valign="top" bgcolor="#E7E9FA" height="403">
+      <p><font _mstmutation="1" _msttexthash="2701127" _msthash="15">Execute o script computer_vision.py usar a webcam e a interface GUI. </font><table width="662" border="0">
+        <tbody><tr>
+          <th width="296" scope="row"><img src="./Visão Computacional_files/gui.gif" width="320" height="243"></th>
+          <td width="356"><img src="./Visão Computacional_files/sliders.jpg" width="294" height="226"></td>
+        </tr>
+      </tbody></table>
+    </p><p _msttexthash="66500967" _msthash="16">Você pode ajustar os parâmetros dos filtros com os controles deslizantes da interface GUI e observar a imagem da janela de visualização correspondente. Mover os controles deslizantes da esquerda para a direita aumenta a força do filtro, então você deve começar com os controles deslizantes para a esquerda e movê-los para a direita o mais longe possível.</p></td>
+  </tr> 
+  
+  
+  
+  <tr> 
+    <td valign="top" bgcolor="#E7E9FA" height="57"><table width="200" border="0">
+      <tbody><tr>
+        <th scope="row"><img src="./Visão Computacional_files/black0.jpg" width="320" height="240"></th>
+        <td><img src="./Visão Computacional_files/black2.jpg" width="320" height="240"></td>
+      </tr>
+      <tr>
+        <th scope="row"><img src="./Visão Computacional_files/black1.jpg" width="320" height="240"></th>
+        <td bordercolor="#FFFFFF"><p _msttexthash="16294096" _msthash="17">In the upper left picture the <span class="style3">black-filter</span> slider is far to the left, in he upper right picture it is too far to the right because the lower facelets do not pass the filter any more. </p>
+          <p _msttexthash="4060277" _msthash="18">The  picture on the left shows a good calibration and gives a good facelet separation.</p></td>
+      </tr>
+    </tbody></table>
+      <p>&nbsp;</p>
+      <table width="200" border="0">
+        <tbody><tr>
+          <th scope="row"><img src="./Visão Computacional_files/white0.jpg" width="320" height="240"></th>
+          <td><img src="./Visão Computacional_files/white2.jpg" width="320" height="240"></td>
+        </tr>
+        <tr>
+          <th scope="row"><img src="./Visão Computacional_files/white1.jpg" width="320" height="240"></th>
+          <td><p _msttexthash="37820575" _msthash="19">In the upper left picture both <span class="style3">white-filter</span> sliders are on the left, the white facelet (see the color picture above) passes the filter but also a lot of other stuff. In the upper right picture the sliders are pushed too far to the right - the white facelet does not pass any more.</p>
+          <p _msttexthash="2775331" _msthash="20">The picture on the left shows a  good calibration of the white-filter.</p></td>
+        </tr>
+      </tbody></table>      
+      <p>&nbsp;</p>
+      <table width="653" border="0">
+        <tbody><tr>
+          <th width="322" scope="row"><img src="./Visão Computacional_files/color0.jpg" width="320" height="240"></th>
+          <td width="321" _msttexthash="30892615" _msthash="21">The<span class="style3"> color-filter</span> works similar. All colored facelets must pass through - but not necessarily the white facelets. So the picture on the left side gives a valid calibration though the white facelet in the upper left corner is not fully recognized.</td>
+        </tr>
+      </tbody></table>      
+      <p>&nbsp;</p>
+      <table width="652" border="0">
+        <tbody><tr>
+          <th width="322" scope="row"><img src="./Visão Computacional_files/result.jpg" width="320" height="240"></th>
+          <td width="320" _msttexthash="31269303" _msthash="22">The facelets here are all recognized and the colors are assigned correctly. The default positions of the color-sliders work quite well. Usually only the red-orange slider has to be used for calibration if red or orange are not assigned correctly.</td>
+        </tr>
+      </tbody></table>      
+      <p _msttexthash="9358700" _msthash="23">With the "Webcam import" button you can transfer the colors into the GUI client and then rotate the cube to analyze another cube face.</p>
+    </td>
+  </tr>
+<tr> 
+    <td valign="top" bgcolor="#E7E9FA" height="57" _msttexthash="5856110" _msthash="24">The file <a href="https://github.com/hkociemba/RubiksCube-TwophaseSolver/blob/master/vision2.py" target="_blank">vision2.py</a> contains the facelet recognition opencv code together with some documentation.</td>
+</tr>  
+  
+  <tr> 
+    <td valign="top" bgcolor="#E7E9FA" height="57"><p align="center"><font size="-1" _msttexthash="415506" _msthash="25">© 2019 <img src="./Visão Computacional_files/gomail.gif" width="15" height="10">&nbsp;<a href="mailto:kociemba@t-online.de"><b>Herbert 
+    Kociemba</b></a></font></p></td>
+  </tr>
+</tbody></table>
+
+
+
+</body></html>
